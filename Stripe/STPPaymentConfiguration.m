@@ -34,6 +34,7 @@
         _requiredBillingAddressFields = STPBillingAddressFieldsNone;
         _companyName = [NSBundle stp_applicationName];
         _smsAutofillDisabled = NO;
+        _shippingType = STPShippingTypeShipping;
     }
     return self;
 }

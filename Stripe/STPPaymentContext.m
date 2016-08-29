@@ -20,6 +20,8 @@
 #import "STPPaymentConfiguration+Private.h"
 #import "STPWeakStrongMacros.h"
 #import "STPPaymentContextAmountModel.h"
+#import "STPShippingAddressViewController.h"
+#import "STPShippingMethodsViewController.h"
 
 #define FAUXPAS_IGNORED_IN_METHOD(...)
 
@@ -198,6 +200,8 @@
                                                         companyName:self.configuration.companyName];
 }
 
+#pragma mark - Payment Methods
+
 - (void)presentPaymentMethodsViewController {
     NSCAssert(self.hostViewController != nil, @"hostViewController must not be nil on STPPaymentContext when calling pushPaymentMethodsViewController on it. Next time, set the hostViewController property first!");
     WEAK(self);
@@ -266,6 +270,40 @@
         }];
     }
 }
+
+#pragma mark - Shipping Info
+
+- (void)presentShippingInfoViewController {
+    NSCAssert(self.hostViewController != nil, @"hostViewController must not be nil on STPPaymentContext when calling pushPaymentMethodsViewController on it. Next time, set the hostViewController property first!");
+    WEAK(self);
+    [self.didAppearPromise voidOnSuccess:^{
+        STRONG(self);
+//        STPShippingAddressViewController *addressViewController = [[STPShippingAddressViewController alloc] initWithConfiguration:self.configuration theme:self.theme];
+//        // TODO: prefilled information
+//        UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:addressViewController];
+//        [navigationController.navigationBar stp_setTheme:self.theme];
+//        navigationController.modalPresentationStyle = self.modalPresentationStyle;
+//        [self.hostViewController presentViewController:navigationController animated:YES completion:nil];
+
+        STPShippingMethod *method1 = [[STPShippingMethod alloc] init];
+        method1.identifier = @"123";
+        method1.label = @"UPS Ground";
+        method1.detail = @"Arrives Feb 5 - Feb 9";
+        method1.amount = [NSDecimalNumber decimalNumberWithString:@"0.00"];
+        STPShippingMethod *method2 = [[STPShippingMethod alloc] init];
+        method2.identifier = @"456";
+        method2.label = @"FedEx 3 Day";
+        method2.detail = @"Arrives Feb 4 - Feb 5";
+        method2.amount = [NSDecimalNumber decimalNumberWithString:@"5.99"];
+        STPShippingMethodsViewController *nextViewController = [[STPShippingMethodsViewController alloc] initWithShippingMethods:@[method1, method2] theme:self.theme];
+        UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:nextViewController];
+        [navigationController.navigationBar stp_setTheme:self.theme];
+        navigationController.modalPresentationStyle = self.modalPresentationStyle;
+        [self.hostViewController presentViewController:navigationController animated:YES completion:nil];
+    }];
+}
+
+#pragma mark - Request Payment
 
 - (void)requestPayment {
     FAUXPAS_IGNORED_IN_METHOD(APIAvailability);

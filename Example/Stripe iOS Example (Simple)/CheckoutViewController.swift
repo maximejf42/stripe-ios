@@ -13,7 +13,7 @@ class CheckoutViewController: UIViewController, STPPaymentContextDelegate {
 
     // 1) To get started with this demo, first head to https://dashboard.stripe.com/account/apikeys
     // and copy your "Test Publishable Key" (it looks like pk_test_abcdef) into the line below.
-    let stripePublishableKey = ""
+    let stripePublishableKey = "pk_test_DhW2G4j13BMRIC7gd55hZeW3"
     
     // 2) Next, optionally, to have this demo save your user's payment details, head to
     // https://github.com/stripe/example-ios-backend , click "Deploy to Heroku", and follow
@@ -33,6 +33,7 @@ class CheckoutViewController: UIViewController, STPPaymentContextDelegate {
 
     let theme: STPTheme
     let paymentRow: CheckoutRowView
+    let shippingRow: CheckoutRowView
     let totalRow: CheckoutRowView
     let buyButton: BuyButton
     let rowHeight: CGFloat = 44
@@ -61,6 +62,8 @@ class CheckoutViewController: UIViewController, STPPaymentContextDelegate {
         self.productImage.text = product
         self.theme = settings.theme
         self.paymentRow = CheckoutRowView(title: "Payment", detail: "Select Payment",
+                                          theme: settings.theme)
+        self.shippingRow = CheckoutRowView(title: "Shipping", detail: "Enter Shipping Info",
                                           theme: settings.theme)
         self.totalRow = CheckoutRowView(title: "Total", detail: "", tappable: false,
                                         theme: settings.theme)
@@ -106,6 +109,7 @@ class CheckoutViewController: UIViewController, STPPaymentContextDelegate {
         self.productImage.font = UIFont.systemFontOfSize(70)
         self.view.addSubview(self.totalRow)
         self.view.addSubview(self.paymentRow)
+        self.view.addSubview(self.shippingRow)
         self.view.addSubview(self.productImage)
         self.view.addSubview(self.buyButton)
         self.view.addSubview(self.activityIndicator)
@@ -114,6 +118,9 @@ class CheckoutViewController: UIViewController, STPPaymentContextDelegate {
         self.totalRow.detail = "$\(self.paymentContext.paymentAmount/100).00"
         self.paymentRow.onTap = { [weak self] _ in
             self?.paymentContext.pushPaymentMethodsViewController()
+        }
+        self.shippingRow.onTap = { [weak self] _ in
+            self?.paymentContext.presentShippingInfoViewController()
         }
     }
 
@@ -125,7 +132,9 @@ class CheckoutViewController: UIViewController, STPPaymentContextDelegate {
                                                CGRectGetHeight(self.productImage.bounds)/2.0 + rowHeight)
         self.paymentRow.frame = CGRectMake(0, CGRectGetMaxY(self.productImage.frame) + rowHeight,
                                            width, rowHeight)
-        self.totalRow.frame = CGRectMake(0, CGRectGetMaxY(self.paymentRow.frame),
+        self.shippingRow.frame = CGRectMake(0, CGRectGetMaxY(self.paymentRow.frame),
+                                           width, rowHeight)
+        self.totalRow.frame = CGRectMake(0, CGRectGetMaxY(self.shippingRow.frame),
                                          width, rowHeight)
         self.buyButton.frame = CGRectMake(0, 0, 88, 44)
         self.buyButton.center = CGPointMake(width/2.0, CGRectGetMaxY(self.totalRow.frame) + rowHeight*1.5)
